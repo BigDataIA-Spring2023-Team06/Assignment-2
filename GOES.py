@@ -4,6 +4,7 @@ import time as tm
 from datetime import datetime, timedelta,time, date
 # import helper_functions.goes_module
 import requests
+import helper
 
 # Connect to the database
 # Connect to the database
@@ -63,7 +64,6 @@ with st.form(key="my_form"):
             day = selected_date.strftime("%d")
             hour = selected_time.strftime("%H")
 
-            
             #APIed code 
             response_goes_files = requests.get(f"{api_host}/get_files_goes/{year}/{month}/{day}/{hour}")
             selected_files = dict(response_goes_files.json())["list_of_files"]
@@ -72,7 +72,7 @@ with st.form(key="my_form"):
             download = st.form_submit_button("Get URL")
             url = ("1", "1")
             if download:
-                
+
                 payload = {"src_file_key":file_to_download, "src_bucket_name":"noaa-goes18", "dst_bucket_name":"goes-team6", "dataset":"GOES"}
                 print(payload)
                 response_s3 = requests.post(f"{api_host}/copy_to_s3/", params=payload)
@@ -88,19 +88,39 @@ with st.form(key="my_form"):
                 st.write("Data for selected date and hour is present on the metadata db",selected_date, selected_datetime.hour)
                 #cw_logs.add_logs_goes_search(selected_date, hour, file_to_download, url[1], url[0])
 
+with st.form("url_generator"):
+    st.title("Search by Filename")
+    filename = st.text_input("Please enter filename")
+    url_button = st.form_submit_button("Generate URL")
+    if url_button:
+        try:
+            split = filename.split('_')
+            timeStamp = split[4][1:]
+            year = timeStamp[:4]
+            day = timeStamp[4:7] 
+            hour = timeStamp[7:9]
 
-# with st.form("url_generator"):
-#     st.title("Search by Filename")
-#     filename = st.text_input("Please enter filename")
-#     url_button = st.form_submit_button("Generate URL")
-#     if url_button:
-        
-#         try:
-#             split = filename.split('_')
-#             timeStamp = split[4][1:]
-#             year = timeStamp[:4]
-#             day = timeStamp[4:7] 
-#             hour = timeStamp[7:9]
+            #APIed code
+            x = "ABI-L1b-RadC" + "/" + timeStamp[:4] + "/" + timeStamp[4:7] + "/" +  timeStamp[7:9] + "/" + filename
+            if (not helper.validate_filename_goes(filename)):
+                st.write("File Format Incorrect")
+            elif (not helper.file_exists("noaa-goes18", x)):
+                st.write("File Does Not Exist")
+#                 cw_logs.add_logs_file("GOES", filename, "File Does Not Exist")
+            else:
+                filename_url = requests.get(f"{api_host}/get_url_goes_original/{filename}")
+                url = dict(filename_url.json())["original url"]
+                st.write(url)
+#                 cw_logs.add_logs_file("GOES", filename, url)
+        except:
+            st.write("Invalid File Name")
+
+
+
+
+
+# http://34.138.242.155:8000/get_url_goes_original/OR_ABI-L1b-RadC-M6C01_G18_s20230100506171_e20230100508546_c20230100508584.nc
+
 #             x = "ABI-L1b-RadC" + "/" + timeStamp[:4] + "/" + timeStamp[4:7] + "/" +  timeStamp[7:9] + "/" + filename
 #             # Extracting the timestamp
 #             if (not helper.validate_filename_goes(filename)):
