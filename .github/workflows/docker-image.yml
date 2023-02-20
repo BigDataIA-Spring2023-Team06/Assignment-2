@@ -22,15 +22,10 @@ jobs:
           
       
     - name: Build the Docker image
-      run: docker build -t streamlit_docker:${GITHUB_SHA::8} .
-      
-    - name: List Docker Images 
-      run: docker images
-      
-    - name: Docker tag
-      run:  docker tag streamlit_docker:${GITHUB_SHA::8} sneh3298/goesnex-fastapi:streamlit-docker-${GITHUB_SHA::8}
+      run: docker build . --file Dockerfile --tag sneh3298/goesnex-fastapi:${GITHUB_SHA::8}
       
     - name: Docker push 
-      run: docker push sneh3298/goesnex-fastapi:streamlit-docker-${GITHUB_SHA::8}
+      run: docker push sneh3298/goesnex-fastapi
+        
       
     
