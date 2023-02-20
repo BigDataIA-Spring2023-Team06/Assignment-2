@@ -25,15 +25,15 @@ jobs:
     
     
     - name: Build the Docker image
-      run: docker build -t streamlit_docker:"$IMAGE_TAG" .
+      run: docker build -t streamlit_docker:${{ IMAGE_TAG }} .
       
     - name: List Docker Images 
       run: docker images
       
     - name: Docker tag
-      run:  docker tag streamlit_docker:"$IMAGE_TAG" sneh3298/goesnex-fastapi:streamlit-docker-"$IMAGE_TAG"
+      run:  docker tag streamlit_docker:${{ IMAGE_TAG }} sneh3298/goesnex-fastapi:streamlit-docker-${{ IMAGE_TAG }}
       
     - name: Docker push 
-      run: docker push sneh3298/goesnex-fastapi:streamlit-docker-"$IMAGE_TAG"
+      run: docker push sneh3298/goesnex-fastapi:streamlit-docker-${{ IMAGE_TAG }}
       
     
