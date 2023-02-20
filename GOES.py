@@ -7,7 +7,6 @@ import requests
 import helper
 
 # Connect to the database
-# Connect to the database
 conn = sqlite3.connect('metadata_db/s3_metadata_goes.db')
 # Create a cursor object
 cursor = conn.cursor()
