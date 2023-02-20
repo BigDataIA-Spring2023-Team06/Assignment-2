@@ -20,6 +20,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}      # fetch from dockerhub
           
     - uses: actions/checkout@v3
+    
     - name: Build the Docker image
       run: docker build -t streamlit_docker:$(date +%s) .
       
@@ -27,6 +28,6 @@ jobs:
       run:  docker tag streamlit_docker:$(date +%s) sneh3298/goesnex-fastapi:streamlit-docker-$(date +%s)
       
     - name: Docker push 
-    - run: docker push sneh3298/goesnex-fastapi:streamlit-docker-$(date +%s)
+      run: docker push sneh3298/goesnex-fastapi:streamlit-docker-$(date +%s)
       
     
