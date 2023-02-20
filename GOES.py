@@ -34,7 +34,7 @@ headers = {"Content-Type": "application/json"}
 api_host = "http://34.138.242.155:8000"
 
 with st.form(key="my_form"):
-    st.title("GOES")
+    st.title("GOES-Dockerized")
     # Create a date input widget
     selected_date = st.date_input("Date:", min_value=min(unique_dates), max_value=date.today())
     # selected_time = st.time_input("Time:")
