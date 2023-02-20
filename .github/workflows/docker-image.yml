@@ -14,18 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    
-    - name: git variables
-      run: echo "{IMAGE_TAG}={value}" >> $GITHUB_ENV
-      
-    - name: Login to Docker Hub
+    - uses: actions/checkout@v3      
+      name: Login to Docker Hub
       with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}   # fetch from dockerhub
           password: ${{ secrets.DOCKERHUB_TOKEN }}      # fetch from dockerhub
           
-    
-    
+    - name: git variables
+      run: echo "{IMAGE_TAG}={value}" >> $GITHUB_ENV
+      
     - name: Build the Docker image
       run: docker build -t streamlit_docker:${{ env.IMAGE_TAG }} .
       
