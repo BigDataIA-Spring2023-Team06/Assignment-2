@@ -4,10 +4,7 @@ import time as tm
 from datetime import datetime, timedelta,time, date
 import pandas as pd
 # import helper_functions.goes_module
-from helper_functions import goes_module
-from helper_functions import helper
-from helper_functions import cw_logs
-from helper_functions import noes_module
+import helper
 import openpyxl
 import requests
 
@@ -191,8 +188,9 @@ if submit_station:
 #             selected_files = dict(response_goes_files.json())["list_of_files"]
 # "/get_files_noaa/{station}/{year}/{month}/{day}/{hour}"
         response_nexrad_files = requests.get(f"{api_host}/get_files_noaa/{station}/{year}/{month}/{day}/{hour}")
+        print(response_nexrad_files.json())
         selected_files = dict(response_nexrad_files.json())['list of files']
-        add_to_session_state("file_list", files)
+        add_to_session_state("file_list", selected_files)
 
     except:
         st.write("Please Enter All the Details")
@@ -202,7 +200,7 @@ if submit_station:
 if "file_list" in st.session_state:    
     files = st.session_state["file_list"]
 
-
+print(files)
 selected_file = st.selectbox('Files Available', files, key = "nexrad_file_selected")
 add_to_session_state("selected_file", selected_file)
 
@@ -233,10 +231,10 @@ with st.form("url_generator"):
         
         if(not helper.validate_filename_nexrad(filename)):
             st.write("File Name Format Not Correct")
-            cw_logs.add_logs_file("NEXRAD", filename, "File Name Format Not Correct")
+            #cw_logs.add_logs_file("NEXRAD", filename, "File Name Format Not Correct")
         elif(not helper.file_exists("noaa-nexrad-level2", x)):
             st.write("File Does Not Exist")
-            cw_logs.add_logs_file("NEXRAD", filename, "File Does Not Exist")		
+            #cw_logs.add_logs_file("NEXRAD", filename, "File Does Not Exist")		
         else:
             filename_url = requests.get(f"{api_host}/get_url_nexrad_original/{filename}")
             url = dict(filename_url.json())["original url"]

@@ -21,3 +21,10 @@ def file_exists(bucket_name, object_key):
 def validate_filename_goes(filename):
     pattern = re.compile(r"^OR_ABI-L1b-RadC-M6C\d{2}_G\d{2}_s\d{14}_e\d{14}_c\d{14}\.nc$")
     return bool(pattern.match(filename))
+
+def validate_filename_nexrad(filename):
+    pattern = r"^[A-Z]{4}[0-9]{8}_[0-9]{6}_V[0-9]{2}$"
+    pattern2 = r"^[A-Z]{4}[0-9]{8}_[0-9]{6}_V[0-9]{2}_MDM$"
+    match1 = re.match(pattern, filename)
+    match2 = re.match(pattern2, filename)
+    return bool(match1) or bool(match2)
