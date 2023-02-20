@@ -21,7 +21,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}      # fetch from dockerhub
           
     - name: git variables
-      run: echo "{IMAGE_TAG}={value}" >> $GITHUB_ENV
+      run: echo "{IMAGE_TAG}={$(date +%s)}" >> $GITHUB_ENV
       
     - name: Build the Docker image
       run: docker build -t streamlit_docker:${{ env.IMAGE_TAG }} .
