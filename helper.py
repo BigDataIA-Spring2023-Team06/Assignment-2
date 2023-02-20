@@ -4,7 +4,9 @@ import re
  
 
 s3 = boto3.client(
-    's3'
+    's3',
+    aws_access_key_id="AKIAZW4EPXNKYZJXKP7Q",
+    aws_secret_access_key="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"
 )
 
 def file_exists(bucket_name, object_key):
