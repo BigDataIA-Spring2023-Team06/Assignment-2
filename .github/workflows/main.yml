@@ -24,7 +24,7 @@ jobs:
       - name: SSH into GCP VM
         uses: appleboy/ssh-action@master
         with:
-          host: damg7250-2
+          host: 34.138.242.155
           username: snehil_aryan7823
           password: Breakingbad@1
           port: 22
