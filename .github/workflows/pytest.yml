@@ -17,5 +17,5 @@ jobs:
       - name: Run tests
         working-directory: .
         run: |
-          pip install -r requirments.txt
+          pip install -r requirements.txt
           pytest -v backend/test_main.py
