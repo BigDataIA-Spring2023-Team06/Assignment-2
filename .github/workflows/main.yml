@@ -26,7 +26,7 @@ jobs:
         with:
           host: 34.138.242.155
           username: snehil_aryan7823
-          password: Breakingbad@1
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
 
       - name: Run Docker container
