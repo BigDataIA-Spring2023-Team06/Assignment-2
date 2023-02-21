@@ -20,14 +20,14 @@ jobs:
         uses: google-github-actions/setup-gcloud@master
         with:
           project_id: DAMG7250
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          service_account_key: 8698f1136f664cb314b875a633d3df5dfeb31483
 
       - name: SSH into GCP VM
         uses: appleboy/ssh-action@master
         with:
           host: damg7250-2
           username: snehil_aryan7823
-          password: ${{ secrets.VM_PASSWORD }}
+          password: Breakingbad@1
           port: 22
 
       - name: Run Docker container
