@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Authenticate with GCP
-        uses: google-github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@v2.2.0
         with:
           project_id: DAMG7250
           service_account_key: 8698f1136f664cb314b875a633d3df5dfeb31483
