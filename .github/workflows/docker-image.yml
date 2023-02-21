@@ -22,6 +22,7 @@ jobs:
     - name: Build the Docker image
       run: docker build -t streamlit_docker:${GITHUB_SHA::8} .
       
+      
     - name: List Docker Images 
       run: docker images
       
