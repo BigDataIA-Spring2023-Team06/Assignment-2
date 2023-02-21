@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: 3.9.16
       - name: Run tests
-        working-directory: ./backend
+        working-directory: .
         run: |
           pip install -r requirments.txt
-          pytest -v test_main.py
+          pytest -v backend/test_main.py
