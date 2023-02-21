@@ -20,7 +20,7 @@ jobs:
         uses: google-github-actions/auth@v0
         with:
           project_id: DAMG7250
-          service_account_key: 8698f1136f664cb314b875a633d3df5dfeb31483
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
 
       - name: SSH into GCP VM
         uses: appleboy/ssh-action@master
