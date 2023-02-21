@@ -24,6 +24,7 @@ jobs:
       - name: SSH into GCP VM Compute
         uses: appleboy/ssh-action@master
         with:
+          SSH_DEBUG: true
           host: 34.138.242.155
           username: snehil_aryan7823
           key: ${{ secrets.SSH_PRIVATE_KEY }}
