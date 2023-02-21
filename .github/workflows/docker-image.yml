@@ -31,7 +31,7 @@ jobs:
       
     - name: Docker tag
       run:  docker tag streamlit_docker:${GITHUB_SHA::8} sneh3298/goesnex-fastapi:streamlit-docker-${GITHUB_SHA::8}
-      
+    
     - name: List Docker Images 
       run: docker images
       
