@@ -27,4 +27,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: sneh3298/goesnex-fastapi:v567
+          tags: sneh3298/app:v56
