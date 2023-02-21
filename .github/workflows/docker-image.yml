@@ -19,8 +19,8 @@ jobs:
         name: Login to DockerHub
         uses: actions/checkout@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}   # fetch from dockerhub
-          password: ${{ secrets.DOCKERHUB_TOKEN }}      # fetch from dockerhub
+          username: sneh3298  # fetch from dockerhub
+          password: Breakingbad@1      # fetch from dockerhub
       -
         name: Build and push
         uses: docker/build-push-action@v3
