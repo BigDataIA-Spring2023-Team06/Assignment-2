@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
     paths: 
-      - 'backend**'
+      - 'streamlit/**'
   pull_request:
     branches: [ "main" ] 
     
