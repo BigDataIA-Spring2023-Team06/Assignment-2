@@ -66,7 +66,7 @@ def copy_to_s3(src_file_key, src_bucket_name, dst_bucket_name, dataset):
 #     return bool(match1) or bool(match2)
 
 def map_viz(station):
-    df = pd.read_csv("backend\Book.csv")
+    df = pd.read_csv("backend/Book.csv")
     for index, row in df.iterrows():
         if row['NAME'] == station:
             return row['NAME'], row['LAT'], row['LON']
