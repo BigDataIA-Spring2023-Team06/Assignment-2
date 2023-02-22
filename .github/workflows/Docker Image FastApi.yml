@@ -29,11 +29,11 @@ jobs:
       run: docker images
       
     - name: Docker tag
-      run:  docker tag fast_api:${GITHUB_SHA::8} sneh3298/goesnex-fastapi:fast_api-${GITHUB_SHA::8}
+      run:  docker tag fast_api_docker:${GITHUB_SHA::8} sneh3298/goesnex-fastapi:fast_api_docker-${GITHUB_SHA::8}
     
     - name: List Docker Images 
       run: docker images
       
     - name: Docker push 
-      run: docker push sneh3298/goesnex-fastapi:fast_api-${GITHUB_SHA::8}
+      run: docker push sneh3298/goesnex-fastapi:fast_api_docker-${GITHUB_SHA::8}
       
