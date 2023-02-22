@@ -12,7 +12,7 @@ def test_copy_to_s3_goes():
     payload = {"src_file_key":file_to_download, "src_bucket_name":"noaa-goes18", "dst_bucket_name":"goes-team6", "dataset":"GOES"}
     exp_response = {'url': ['https://goes-team6.s3.amazonaws.com/GOES/OR_ABI-L1b-RadC-M6C03_G18_s20222520916158_e20222520918531_c20222520918572.nc', 'https://noaa-goes18.s3.amazonaws.com/ABI-L1b-RadC/2022/252/09/OR_ABI-L1b-RadC-M6C03_G18_s20222520916158_e20222520918531_c20222520918572.nc']}
     api_host = "http://127.0.0.1:8000"
-    response_s3 = requests.post(f"{api_host}/copy_to_s3/", params=payload)
+    response_s3 = requests.post("/copy_to_s3/", params=payload)
     assert response_s3.status_code == 200
     assert exp_response == response_s3.json()
 
