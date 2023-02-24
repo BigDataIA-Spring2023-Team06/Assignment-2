@@ -2,7 +2,7 @@ import boto3
 import botocore
 import re
  
-
+ 
 s3 = boto3.client(
     's3',
     aws_access_key_id="AKIAZW4EPXNKYZJXKP7Q",
@@ -17,7 +17,6 @@ def file_exists(bucket_name, object_key):
     except botocore.exceptions.ClientError:
         return False
     return True
-
 
 
 def validate_filename_goes(filename):
