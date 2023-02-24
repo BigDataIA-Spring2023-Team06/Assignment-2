@@ -6,7 +6,7 @@ import requests
 
 "st.session_state object:" , st.session_state
 host_url = "http://127.0.0.1:8501"
-host_url_api = "http://backapi:8000"
+host_url_api = "http://3.22.188.56:8000"
 def add_to_session_state(new, value):
         st.session_state[new] = value
         
