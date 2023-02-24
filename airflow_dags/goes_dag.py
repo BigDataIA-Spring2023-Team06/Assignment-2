@@ -1,7 +1,19 @@
 import pandas as pd
 import snowflake.connector
+from airflow import DAG
 from datetime import datetime, timedelta
 import boto3
+from snowflake.connector.pandas_tools import write_pandas
+# from airflow.operators.bash_operator import BashOperator
+from airflow.operators.python_operator import PythonOperator
+from dotenv import load_dotenv
+import os
+# Load the environment variables from the .env file
+load_dotenv()
+
+# Access the AWS credentials using the environment variables
+access_key = os.getenv("AWS_ACCESS_KEY_ID")
+secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 conn = snowflake.connector.connect(
     user='SANJAYKASHYAP',
@@ -12,6 +24,9 @@ conn = snowflake.connector.connect(
     schema='PUBLIC'
 )
 
+bucket_name = "noaa-nexrad-level2"
+prefix = "ABI-L1b-RadC/"
+s3 = boto3.resource("s3")
 
 def check_last_updated_date_from_snowflake():
     # Create a cursor object
@@ -35,19 +50,9 @@ def check_last_updated_date_from_snowflake():
 
     # Close the cursor and the database connection
     cur.close()
-    conn.close()
     t = results[0]
     last_updated = datetime(t[0], 1, 1) + timedelta(t[1] - 1) + timedelta(hours=t[2])
     return last_updated
-
-
-def connect_to_goes_s3():
-    # Define the S3 bucket and prefix
-    bucket_name = "noaa-goes18"
-    prefix = "ABI-L1b-RadC/"
-    s3 = boto3.resource("s3")
-    return s3, bucket_name, prefix
-
 
 def get_metadata_and_store(s3, bucket_name, prefix, last_updated):
     names = []
@@ -76,59 +81,71 @@ def metadata_data_frame(names):
     data.drop_duplicates(inplace=True)
     return data
 
+def write_to_snowflake(data):
+    data.columns = map(lambda x: str(x).upper(), data.columns)
+    success, nchunks, nrows, _ = write_pandas(conn, data, 'GOES')
+    conn.close()
+
+
 #Define the DAG
+default_args = {
+    'owner': 'team6',
+    'depends_on_past': False,
+    'start_date': datetime(2020, 12, 1),
+    'email': 'mohan.ku@northeastern.edu',
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5)
+}
+#Define the DAG
+
+default_args = {
+    'owner': 'team6',
+    'depends_on_past': False,
+    'start_date': datetime(2023, 2, 24),
+    'email': 'mohan.ku@northeastern.edu',
+    'email_on_failure': False,
+    'email_on_retry': False,
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5)
+}
+
 dag = DAG(
-    dag_id='goes18',
+    'goes_dag',
     default_args=default_args,
-    description='DAG to ingest GOES-18 data',
-    schedule_interval='0 0 * * *',
-    start_date=datetime(2020, 12, 1),
+    description='A simple DAG to get data from GOES S3 bucket and store in Snowflake',
+    schedule_interval="0 0 * * *", # Run once a day at midnight,
     catchup=False
 )
 
-# Define the task to check the last updated date in Snowflake
-check_last_updated_date = PythonOperator(
-    task_id='check_last_updated_date',
+# Define the tasks
+check_last_snowflake_metadb_update = PythonOperator(
+    task_id='check_last_updated_date_from_snowflake',
     python_callable=check_last_updated_date_from_snowflake,
     dag=dag
 )
 
-# Define the task to connect to the S3 bucket
-connect_to_goes_s3 = PythonOperator(
-    task_id='connect_to_goes_s3',
-    python_callable=connect_to_goes_s3,
-    dag=dag
-)
-
-# Define the task to get the metadata and store it in a list
 get_metadata_and_store = PythonOperator(
     task_id='get_metadata_and_store',
     python_callable=get_metadata_and_store,
-    op_kwargs={'s3': s3, 'bucket_name': bucket_name, 'prefix': prefix, 'last_updated': last_updated},
+    op_kwargs={'s3': s3, 'bucket_name': bucket_name, 'prefix': prefix, 'last_updated': check_last_snowflake_metadb_update},
     dag=dag
-)
+)   
 
-# Define the task to create a data frame from the list
-metadata_data_frame = PythonOperator(
+process_metadata = PythonOperator(
     task_id='metadata_data_frame',
     python_callable=metadata_data_frame,
-    op_kwargs={'names': names},
+    op_kwargs={'names': get_metadata_and_store.output},
     dag=dag
 )
 
-# Define the task to write the data frame to Snowflake
 write_to_snowflake = PythonOperator(
     task_id='write_to_snowflake',
     python_callable=write_to_snowflake,
-    op_kwargs={'data': data},
+    op_kwargs={'data': process_metadata.output},
     dag=dag
 )
 
-#Set the dependencies between the tasks and upstrean and downstream tasks
-check_last_updated_date >> connect_to_goes_s3 >> get_metadata_and_store >> metadata_data_frame >> write_to_snowflake
-
-# Run the DAG
-dag.cli()
-
-
+check_last_snowflake_metadb_update >> get_metadata_and_store >> process_metadata >> write_to_snowflake
 
