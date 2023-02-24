@@ -5,9 +5,11 @@ from datetime import datetime, timedelta
 import boto3
 from snowflake.connector.pandas_tools import write_pandas
 # from airflow.operators.bash_operator import BashOperator
-from airflow.operators.python_operator import PythonOperator
+# from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from dotenv import load_dotenv
 import os
+from airflow.executors.kubernetes_executor import KubernetesExecutor
 # Load the environment variables from the .env file
 load_dotenv()
 
@@ -24,7 +26,7 @@ conn = snowflake.connector.connect(
     schema='PUBLIC'
 )
 
-bucket_name = "noaa-nexrad-level2"
+bucket_name = "noaa-goes18"
 prefix = "ABI-L1b-RadC/"
 s3 = boto3.resource("s3")
 
@@ -44,7 +46,7 @@ def check_last_updated_date_from_snowflake():
                     FROM maxyear;"""
     # Execute the SELECT statement to get the last N records from the table
     cur.execute(query)
-
+    conn.close()
     # Fetch the results as a list of tuples
     results = cur.fetchall()
 
@@ -82,33 +84,24 @@ def metadata_data_frame(names):
     return data
 
 def write_to_snowflake(data):
+    conn.connect()
     data.columns = map(lambda x: str(x).upper(), data.columns)
     success, nchunks, nrows, _ = write_pandas(conn, data, 'GOES')
     conn.close()
 
 
 #Define the DAG
-default_args = {
-    'owner': 'team6',
-    'depends_on_past': False,
-    'start_date': datetime(2020, 12, 1),
-    'email': 'mohan.ku@northeastern.edu',
-    'email_on_failure': False,
-    'email_on_retry': False,
-    'retries': 1,
-    'retry_delay': timedelta(minutes=5)
-}
-#Define the DAG
 
 default_args = {
     'owner': 'team6',
     'depends_on_past': False,
-    'start_date': datetime(2023, 2, 24),
+    'start_date': datetime(2023, 2, 1),
     'email': 'mohan.ku@northeastern.edu',
     'email_on_failure': False,
     'email_on_retry': False,
     'retries': 1,
-    'retry_delay': timedelta(minutes=5)
+    'retry_delay': timedelta(minutes=5),
+    'executor': KubernetesExecutor()
 }
 
 dag = DAG(
@@ -117,6 +110,7 @@ dag = DAG(
     description='A simple DAG to get data from GOES S3 bucket and store in Snowflake',
     schedule_interval="0 0 * * *", # Run once a day at midnight,
     catchup=False
+
 )
 
 # Define the tasks
