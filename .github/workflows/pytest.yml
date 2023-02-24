@@ -20,6 +20,11 @@ jobs:
         run: |
           pip install snowflake-connector-python==2.6.0
           
+      - name: Install Jose
+        working-directory: .
+        run: |
+          pip install python-jose==3.3.0
+          
           
       - name: Run tests
         working-directory: .
