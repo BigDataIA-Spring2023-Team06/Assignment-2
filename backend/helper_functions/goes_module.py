@@ -1,4 +1,7 @@
 import boto3
+import snowflake.connector
+
+
 
 s3 = boto3.client(
     's3',
@@ -57,6 +60,30 @@ def get_url_goes_original(filename):
     s3Bucket = split[2][1:3]
     link = f'https://noaa-goes{s3Bucket}.s3.amazonaws.com/{productName}/{year}/{day}/{hour}/{filename}'
     return link
+########################Get the Hours#########################
+conn = snowflake.connector.connect(
+    user='SANJAYKASHYAP',
+    password='Bigdata@23',
+    account='iogoldm-vcb38713',
+    warehouse='COMPUTE_WH',
+    database='SEVIR_META',
+    schema='PUBLIC'
+)
+
+def get_hours(year, month, day):
+    cursor = conn.cursor()
+    day_year = day_of_year(int(year), int(month), int(day))
+    cursor.execute(f"select hour from goes where day = {day_year}")
+    x = cursor.fetchall()
+    return [int(i[0]) for i in x]
+
+# cursor = conn.cursor()
+# day_year = day_of_year(int("2022"), int("11"), int("09"))
+# cursor.execute(f"select hour from goes where day = {day_year}")
+# x = cursor.fetchall()
+
+# res = [int(i[0]) for i in x]
+# print(res)
 
 #print(get_files_goes("2023", "01", "10", "05"))
 

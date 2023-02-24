@@ -56,7 +56,6 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 
-
 def get_password_hash(password):
     return pwd_context.hash(password)
 
@@ -138,6 +137,11 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 async def read_own_items(current_user: User = Depends(get_current_active_user)):
     return [{"item_id": "Foo", "owner": current_user.username}]
 
+#API to get the filtered hours 
+@app.get("/get_hours_goes/{year}/{month}/{day}")
+async def get_hours_goes_api(year, month, day, current_user: User = Depends(get_current_active_user)):
+    return {"hours":gm.get_hours(year, month, day)}
+
 
 #API to get the list of files GOES  
 @app.get("/get_files_goes/{year}/{month}/{day}/{hour}")
@@ -158,6 +162,10 @@ async def plot_map_viz(station, current_user: User = Depends(get_current_active_
     name, lat, lon = helper.map_viz(station)
     return {"name": name, "lat": lat, "lon": lon}
 
+@app.get("/get_stations/{year}/{month}/{day}")
+async def get_stations_api(year, month, day, current_user: User = Depends(get_current_active_user)):
+    return {"stations" : nm.get_stations(year, month, day)}
+        
 
 @app.get("/get_files_noaa/{station}/{year}/{month}/{day}/{hour}")
 async def get_files_noaa_api(station, year, month, day, hour, current_user: User = Depends(get_current_active_user)):
