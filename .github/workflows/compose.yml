@@ -30,7 +30,7 @@ jobs:
       run:  docker tag assignment-2-app:latest sneh3298/goesnex-fastapi:streamlit-compose
       
     - name: Docker tag
-      run:  docker tag assignment-2-app:latest sneh3298/goesnex-fastapi:backend-compose
+      run:  docker tag assignment-2-api:latest sneh3298/goesnex-fastapi:backend-compose
     
     - name: List Docker Images 
       run: docker images
