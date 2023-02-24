@@ -138,6 +138,11 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 async def read_own_items(current_user: User = Depends(get_current_active_user)):
     return [{"item_id": "Foo", "owner": current_user.username}]
 
+#API to get the filtered hours 
+@app.get("/get_hours_goes/{year}/{month}/{day}")
+async def get_hours_goes_api(year, month, day, current_user: User = Depends(get_current_active_user)):
+    return {"hours":gm.get_hours(year, month, day)}
+
 
 #API to get the list of files GOES  
 @app.get("/get_files_goes/{year}/{month}/{day}/{hour}")

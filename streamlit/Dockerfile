@@ -20,7 +20,7 @@ EXPOSE 8080
 # Expose a port inside the container on which services run
 
 #CMD ["gunicorn" ,"-w", "4", "-k", "uvicorn.workers.UvicornWorker" , "--bind", "0.0.0.0:8000", "fastapi_test:app"]
-CMD ["streamlit", "run", "GOES.py","--server.port", "8080"]
+CMD ["streamlit", "run", "Login.py","--server.port", "8080"]
 # gunicorn command to run the service with 4 worker nodes binding localhost/0.0.0.0 on port 8000 refering app inside the main.py
 
 
