@@ -9,7 +9,8 @@ from snowflake.connector.pandas_tools import write_pandas
 from airflow.operators.python import PythonOperator
 from dotenv import load_dotenv
 import os
-from airflow.executors.kubernetes_executor import KubernetesExecutor
+from airflow.executors.local_executor import LocalExecutor
+import great_expectations as ge
 # Load the environment variables from the .env file
 load_dotenv()
 
@@ -83,6 +84,14 @@ def metadata_data_frame(names):
     data.drop_duplicates(inplace=True)
     return data
 
+def run_ge_check(data):
+    context = ge.data_context.DataContext()
+    suite = context.get_expectation_suite('my_suite')
+    batch_kwargs = {'path': '/path/to/my/data'}
+    batch = context.get_batch(batch_kwargs, suite)
+    results = context.run_validation_operator('action_list_operator', assets_to_validate=[batch])
+    return results
+
 def write_to_snowflake(data):
     conn.connect()
     data.columns = map(lambda x: str(x).upper(), data.columns)
@@ -101,45 +110,67 @@ default_args = {
     'email_on_retry': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
-    'executor': KubernetesExecutor()
+    'schedule_interval': '0 0 * * *',
+    'executor': LocalExecutor()
 }
 
-dag = DAG(
-    'goes_dag',
-    default_args=default_args,
-    description='A simple DAG to get data from GOES S3 bucket and store in Snowflake',
-    schedule_interval="0 0 * * *", # Run once a day at midnight,
-    catchup=False
 
-)
+dag = DAG('goes_dag',
+            default_args=default_args,
+            description='GOES DAG',
+            catchup=False)
 
 # Define the tasks
-check_last_snowflake_metadb_update = PythonOperator(
+
+# Task 1: Check the last updated date from Snowflake
+check_last_updated_date_from_snowflake = PythonOperator(
     task_id='check_last_updated_date_from_snowflake',
     python_callable=check_last_updated_date_from_snowflake,
     dag=dag
 )
 
+# Task 2: Get the metadata and store it in a dataframe
+
 get_metadata_and_store = PythonOperator(
     task_id='get_metadata_and_store',
     python_callable=get_metadata_and_store,
-    op_kwargs={'s3': s3, 'bucket_name': bucket_name, 'prefix': prefix, 'last_updated': check_last_snowflake_metadb_update},
-    dag=dag
-)   
-
-process_metadata = PythonOperator(
-    task_id='metadata_data_frame',
-    python_callable=metadata_data_frame,
-    op_kwargs={'names': get_metadata_and_store.output},
+    op_kwargs={'s3': s3, 'bucket_name': bucket_name, 'prefix': prefix, 'last_updated': check_last_updated_date_from_snowflake},
     dag=dag
 )
+
+# Task 3: Create a data frame from the metadata
+
+metadata_data_frame = PythonOperator(
+    task_id='metadata_data_frame',
+    python_callable=metadata_data_frame,
+    op_kwargs={'names': get_metadata_and_store},
+    dag=dag
+)
+
+# Task 4: Run the Great Expectations check
+
+run_ge_check = PythonOperator(
+    task_id='run_ge_check',
+    python_callable=run_ge_check,
+    op_kwargs={'data': metadata_data_frame},
+    dag=dag
+)
+
+# Task 5: Write the data to Snowflake
 
 write_to_snowflake = PythonOperator(
     task_id='write_to_snowflake',
     python_callable=write_to_snowflake,
-    op_kwargs={'data': process_metadata.output},
+    op_kwargs={'data': metadata_data_frame},
     dag=dag
 )
 
-check_last_snowflake_metadb_update >> get_metadata_and_store >> process_metadata >> write_to_snowflake
+# Set the dependencies
+
+# check_last_updated_date_from_snowflake >> get_metadata_and_store >> metadata_data_frame >> run_ge_check >> write_to_snowflake
+
+check_last_updated_date_from_snowflake.set_downstream(get_metadata_and_store)
+get_metadata_and_store.set_downstream(metadata_data_frame)
+metadata_data_frame.set_downstream(write_to_snowflake)
+metadata_data_frame.set_upstream(run_ge_check)
 
