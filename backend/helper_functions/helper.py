@@ -6,7 +6,7 @@ import boto3
 import botocore
 import re
 import pandas as pd
-
+df = pd.read_csv("Book.csv")
 #Function to check if a file exists in the s3 bucket 
 s3 = boto3.client(
     's3',
@@ -66,7 +66,7 @@ def copy_to_s3(src_file_key, src_bucket_name, dst_bucket_name, dataset):
 #     return bool(match1) or bool(match2)
 
 def map_viz(station):
-    df = pd.read_csv("backend/Book.csv")
+    # df = pd.read_csv("Book.csv")
     for index, row in df.iterrows():
         if row['NAME'] == station:
             return row['NAME'], row['LAT'], row['LON']
