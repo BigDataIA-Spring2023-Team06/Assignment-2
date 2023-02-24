@@ -15,7 +15,7 @@ dates_stations = cursor.fetchall()
 conn.close()
 
 headers = {"Content-Type": "application/json"}
-api_host = "http://34.138.242.155:8000"
+api_host = "http://localhost:8000"
 
 state_codes_usa = ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
             'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
