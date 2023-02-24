@@ -5,8 +5,8 @@ The goal of this project is to decouple a Streamlit application from Assignment 
 
 [API Link](http://3.22.188.56:8000/docs) <br>
 [Application Link](http://3.22.188.56:8081/) <br>
-[Code Labs](https://codelabs-preview.appspot.com/?file_id=1Gy7dnVdbfe-HGcWbi5bKURG_uucu6UIAr8DPm78PdxQ#0)
-[Great Expectations Report - GOES](https://sevirmetadata.s3.amazonaws.com/goes/11a1ad35a28967ab586f265b047fa304.html)
+[Code Labs](https://codelabs-preview.appspot.com/?file_id=1Gy7dnVdbfe-HGcWbi5bKURG_uucu6UIAr8DPm78PdxQ#0) <br>
+[Great Expectations Report - GOES](https://sevirmetadata.s3.amazonaws.com/goes/11a1ad35a28967ab586f265b047fa304.html) <br>
 [Great Expectations Report - Nexrad](https://sevirmetadata.s3.amazonaws.com/noes/67f39a20826a1804cda89c0f120e141a.html)
 
 
