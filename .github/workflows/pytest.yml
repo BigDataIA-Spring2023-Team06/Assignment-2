@@ -20,6 +20,11 @@ jobs:
         run: |
           pip install snowflake-connector-python==2.6.0
           
+      - name: Install passlib
+        working-directory: .
+        run: |
+          pip install passlib==1.7.4  
+          
       - name: Install Jose
         working-directory: .
         run: |
