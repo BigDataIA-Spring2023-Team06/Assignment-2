@@ -16,8 +16,7 @@ def app():
     
     file_to_download = ''
     dest_url = ''
-    headers = {"Content-Type": "application/json"}
-    api_host = "http://localhost:8000"
+    api_host = "http://172.17.0.2:8000"
     access_token = st.session_state["access_token"]
     headers = {"Authorization": f"Bearer {access_token}"}
     selected_date = ''

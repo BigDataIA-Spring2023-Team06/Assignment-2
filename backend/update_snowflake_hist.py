@@ -31,3 +31,8 @@ conn = snowflake.connector.connect(
 # df.columns = map(lambda x: str(x).lower(), df.columns)
 # print(df.head())
 # success, nchunks, nrows, _ = write_pandas(conn, df, 'NOES')
+
+# df = pd.read_excel("backend/nexrad.xlsx").dropna()
+# df.columns = map(lambda x: str(x).upper(), df.columns)
+# print(df.head())
+# success, nchunks, nrows, _ = write_pandas(conn, df, 'NEXRAD_STATIONS')

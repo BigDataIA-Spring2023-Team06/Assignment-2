@@ -1,4 +1,5 @@
 import boto3
+import snowflake.connector
 
 s3 = boto3.client(
     's3',
@@ -29,9 +30,29 @@ def get_files_noaa(station, year, month, day, hour):
 def get_url_nexrad_original(file_name):
     return "https://noaa-nexrad-level2.s3.amazonaws.com/" + file_name[4:8] + "/" + file_name[8:10] + "/" + file_name[10:12] + "/" + file_name[0:4] + "/" + file_name
 
-   
-   
-   
+conn = snowflake.connector.connect(
+    user='SANJAYKASHYAP',
+    password='Bigdata@23',
+    account='iogoldm-vcb38713',
+    warehouse='COMPUTE_WH',
+    database='SEVIR_META',
+    schema='PUBLIC'
+)
+
+
+def get_stations(year, month, day):
+    cursor = conn.cursor()
+    cursor.execute(f'select "station_name" from noes where "year" = {year} and "month" = {month} and "day" = {day}')
+    return [i[0] for i in cursor.fetchall()]
+
+# def states_from_stations(stations):
+    
+# state_codes = pd.read_excel("streamlit/pages/nexrad.xlsx").dropna()
+# state_codes = state_codes[["NAME", "ST"]]
+
+
+#print(get_stations("2022", "11", "01")) 
+    
    
    
    
